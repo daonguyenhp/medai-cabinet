@@ -1,0 +1,312 @@
+/* ─── AI Triage Chat ─────────────────────────────────────────── */
+.ai-triage-chat { display: flex; flex-direction: column; gap: var(--space-6); }
+
+.triage-input-section { display: flex; flex-direction: column; gap: var(--space-4); }
+
+.triage-textarea { min-height: 120px; font-size: var(--font-size-md); }
+
+.triage-quick-symptoms { display: flex; flex-direction: column; gap: var(--space-2); }
+
+.triage-quick-label {
+  font-size: var(--font-size-sm);
+  font-weight: 600;
+  color: var(--color-text-muted);
+}
+
+.triage-quick-grid { display: flex; flex-wrap: wrap; gap: var(--space-2); }
+
+.triage-quick-btn {
+  padding: var(--space-2) var(--space-3);
+  border-radius: var(--radius-full);
+  border: 1.5px solid var(--color-border);
+  background: var(--color-surface);
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-sm);
+  font-weight: 500;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  min-height: 36px;
+}
+
+.triage-quick-btn:hover,
+.triage-quick-btn.active {
+  border-color: var(--color-primary);
+  background: var(--color-primary-50);
+  color: var(--color-primary);
+  font-weight: 600;
+}
+
+/* ─── Triage Result ──────────────────────────────────────────── */
+.triage-result {
+  background: var(--color-surface);
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--color-border-light);
+  overflow: hidden;
+}
+
+.triage-result-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--space-4) var(--space-5);
+  background: var(--color-primary-50);
+  border-bottom: 1px solid var(--color-border-light);
+}
+
+.triage-result-title {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  font-size: var(--font-size-md);
+  font-weight: 700;
+  color: var(--color-primary);
+}
+
+.triage-assessment {
+  padding: var(--space-5);
+  font-size: var(--font-size-md);
+  color: var(--color-text-primary);
+  line-height: 1.7;
+  border-bottom: 1px solid var(--color-border-light);
+}
+
+.triage-section {
+  padding: var(--space-4) var(--space-5);
+  border-bottom: 1px solid var(--color-border-light);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.triage-section-title {
+  font-size: var(--font-size-base);
+  font-weight: 700;
+  color: var(--color-text-primary);
+}
+
+.triage-rec {
+  padding: var(--space-3) var(--space-4);
+  background: var(--color-bg);
+  border-radius: var(--radius-md);
+  border: 1px solid var(--color-border-light);
+}
+
+.triage-rec-expiry { border-color: var(--color-warning); background: var(--color-warning-bg); }
+
+.triage-rec-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: var(--space-2);
+}
+
+.triage-rec-name { font-size: var(--font-size-base); font-weight: 700; color: var(--color-text-primary); }
+.triage-rec-badges { display: flex; gap: var(--space-2); }
+
+.triage-rec-detail {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  font-size: var(--font-size-sm);
+  color: var(--color-text-secondary);
+}
+
+.triage-doctor-alert {
+  margin: var(--space-4) var(--space-5);
+  border-radius: var(--radius-md);
+}
+
+.triage-advice {
+  padding: var(--space-4) var(--space-5);
+  border-bottom: 1px solid var(--color-border-light);
+}
+
+.triage-advice p { font-size: var(--font-size-base); color: var(--color-text-secondary); margin: var(--space-2) 0 0; }
+
+.triage-disclaimer {
+  padding: var(--space-4) var(--space-5);
+  font-size: var(--font-size-sm);
+  color: var(--color-text-muted);
+  background: var(--color-bg);
+}
+
+/* ─── Quick Check Sidebar ────────────────────────────────────── */
+.triage-all-ok {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-5);
+  text-align: center;
+  color: var(--color-success);
+}
+
+.triage-ok-icon { font-size: 40px; }
+
+.triage-check-title {
+  font-size: var(--font-size-sm);
+  font-weight: 700;
+  margin-bottom: var(--space-2);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.triage-check-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: var(--space-2) var(--space-3);
+  border-radius: var(--radius-sm);
+  margin-bottom: var(--space-1);
+  font-size: var(--font-size-sm);
+}
+
+.triage-check-expired { background: var(--color-danger-bg); }
+.triage-check-warning { background: var(--color-warning-bg); }
+
+/* ─── Emergency Contacts ─────────────────────────────────────── */
+.emergency-contacts { display: flex; flex-direction: column; gap: var(--space-3); }
+
+.emergency-btn {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-3) var(--space-4);
+  border-radius: var(--radius-md);
+  text-decoration: none;
+  transition: all var(--transition-fast);
+  min-height: var(--touch-target);
+}
+
+.emergency-btn:hover { transform: translateY(-1px); box-shadow: var(--shadow-md); text-decoration: none; }
+
+.emergency-btn-red  { background: var(--color-danger-bg); border: 1.5px solid var(--color-danger); color: var(--color-danger); }
+.emergency-btn-blue { background: var(--color-info-bg);   border: 1.5px solid var(--color-info);   color: var(--color-info); }
+
+.emergency-icon  { font-size: 24px; }
+.emergency-name  { font-size: var(--font-size-sm); font-weight: 600; }
+.emergency-number { font-size: var(--font-size-xl); font-weight: 800; font-family: 'Nunito', sans-serif; }
+
+/* ─── Tips ───────────────────────────────────────────────────── */
+.triage-tips {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.triage-tips li {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-2);
+  font-size: var(--font-size-sm);
+  color: var(--color-text-secondary);
+  padding: var(--space-2) 0;
+  border-bottom: 1px solid var(--color-border-light);
+}
+
+.triage-tips li:last-child { border-bottom: none; }
+
+.triage-tips li::before {
+  content: '•';
+  color: var(--color-teal);
+  font-weight: 700;
+  flex-shrink: 0;
+}
+
+/* ─── Chat ───────────────────────────────────────────────────── */
+.triage-chat-section {
+  background: var(--color-surface);
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--color-border-light);
+  overflow: hidden;
+}
+
+.triage-chat-title {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-4) var(--space-5);
+  font-size: var(--font-size-base);
+  font-weight: 700;
+  color: var(--color-primary);
+  border-bottom: 1px solid var(--color-border-light);
+  background: var(--color-primary-50);
+}
+
+.chat-messages {
+  padding: var(--space-4);
+  max-height: 400px;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.chat-message { display: flex; align-items: flex-end; gap: var(--space-2); }
+.chat-user    { flex-direction: row-reverse; }
+
+.chat-avatar {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 11px;
+  font-weight: 700;
+  flex-shrink: 0;
+}
+
+.chat-avatar-ai   { background: var(--color-primary); color: white; }
+.chat-avatar-user { background: var(--color-teal);    color: white; }
+
+.chat-bubble {
+  max-width: 75%;
+  padding: var(--space-3) var(--space-4);
+  border-radius: var(--radius-lg);
+  font-size: var(--font-size-base);
+  line-height: 1.6;
+}
+
+.chat-bubble-ai   { background: var(--color-primary-50); color: var(--color-text-primary); border-bottom-left-radius: 4px; }
+.chat-bubble-user { background: var(--color-primary);    color: white;                     border-bottom-right-radius: 4px; }
+
+.chat-typing {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: var(--space-3) var(--space-4);
+}
+
+.chat-typing span {
+  width: 8px;
+  height: 8px;
+  background: var(--color-primary);
+  border-radius: 50%;
+  animation: typing 1.2s infinite;
+}
+
+.chat-typing span:nth-child(2) { animation-delay: 0.2s; }
+.chat-typing span:nth-child(3) { animation-delay: 0.4s; }
+
+@keyframes typing {
+  0%, 60%, 100% { transform: translateY(0);   opacity: 0.4; }
+  30%            { transform: translateY(-6px); opacity: 1; }
+}
+
+.chat-input-row {
+  display: flex;
+  gap: var(--space-3);
+  padding: var(--space-4);
+  border-top: 1px solid var(--color-border-light);
+}
+
+/* ─── Triage sidebar responsive ──────────────────────────────── */
+@media (max-width: 1024px) {
+  .triage-sidebar { display: grid; grid-template-columns: repeat(2, 1fr); gap: var(--space-4); }
+}
+
+@media (max-width: 768px) {
+  .triage-sidebar { grid-template-columns: 1fr; }
+}

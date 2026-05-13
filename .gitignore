@@ -1,0 +1,83 @@
+# ============================================================
+# MedAI Cabinet — .gitignore
+# ============================================================
+
+# ── Secrets & credentials ───────────────────────────────────
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+*.crt
+*.p12
+*.pfx
+certs/
+!certs/.gitkeep
+
+# ── Python ──────────────────────────────────────────────────
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+.Python
+*.egg
+*.egg-info/
+dist/
+build/
+eggs/
+parts/
+var/
+sdist/
+develop-eggs/
+.installed.cfg
+lib/
+lib64/
+.venv/
+venv/
+env/
+ENV/
+.python-version
+
+# ── Node / Frontend ─────────────────────────────────────────
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.pnpm-debug.log*
+frontend/build/
+frontend/dist/
+.next/
+.nuxt/
+
+# ── PlatformIO / Firmware ───────────────────────────────────
+firmware/.pio/build/
+firmware/.pio/libdeps/
+firmware/.cache/
+firmware/.pioenvs/
+
+# ── Docker ──────────────────────────────────────────────────
+*.log
+
+# ── IDE & OS ────────────────────────────────────────────────
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# ── AWS / Terraform ─────────────────────────────────────────
+infrastructure/.terraform/
+infrastructure/terraform.tfstate
+infrastructure/terraform.tfstate.backup
+infrastructure/*.tfvars
+!infrastructure/*.tfvars.example
+.aws/
+
+# ── FAISS / ML artifacts (nếu thêm RAG sau) ─────────────────
+*.faiss
+*.index
+vector_store/
+embeddings/

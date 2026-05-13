@@ -1,0 +1,72 @@
+version: "3.9"
+
+services:
+  # ── FastAPI Backend ──────────────────────────────────────────────────────────
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: medai-backend
+    ports:
+      - "8000:8000"
+    environment:
+      - ENVIRONMENT=development
+      - DEBUG=true
+      - AWS_REGION=${AWS_REGION:-ap-southeast-1}
+      - AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID:-}
+      - AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY:-}
+      - DYNAMODB_USERS_TABLE=${DYNAMODB_USERS_TABLE:-medai-users}
+      - DYNAMODB_MEDICATIONS_TABLE=${DYNAMODB_MEDICATIONS_TABLE:-medai-medications}
+      - DYNAMODB_SCHEDULES_TABLE=${DYNAMODB_SCHEDULES_TABLE:-medai-schedules}
+      - DYNAMODB_DOSE_HISTORY_TABLE=${DYNAMODB_DOSE_HISTORY_TABLE:-medai-dose-history}
+      - DYNAMODB_ALERTS_TABLE=${DYNAMODB_ALERTS_TABLE:-medai-alerts}
+      - DYNAMODB_TELEMETRY_TABLE=${DYNAMODB_TELEMETRY_TABLE:-medai-device-telemetry}
+      - IOT_ENDPOINT=${IOT_ENDPOINT:-}
+      - SNS_ALERT_TOPIC_ARN=${SNS_ALERT_TOPIC_ARN:-}
+      - BEDROCK_MODEL_ID=${BEDROCK_MODEL_ID:-anthropic.claude-3-sonnet-20240229-v1:0}
+      - CORS_ORIGINS=["http://localhost:3000","http://frontend:3000"]
+    volumes:
+      - ./backend:/app
+      - ./certs:/certs:ro
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  # ── React Frontend ───────────────────────────────────────────────────────────
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: medai-frontend
+    ports:
+      - "3000:3000"
+    environment:
+      - REACT_APP_API_URL=http://localhost:8000
+      - CHOKIDAR_USEPOLLING=true
+    volumes:
+      - ./frontend/src:/app/src
+      - ./frontend/public:/app/public
+    depends_on:
+      - backend
+    restart: unless-stopped
+
+  # ── LocalStack (local AWS emulation for development) ─────────────────────────
+  localstack:
+    image: localstack/localstack:3.0
+    container_name: medai-localstack
+    ports:
+      - "4566:4566"
+    environment:
+      - SERVICES=dynamodb,s3,sns,iot
+      - DEBUG=0
+      - DATA_DIR=/tmp/localstack/data
+    volumes:
+      - localstack_data:/tmp/localstack
+    profiles:
+      - local-aws
+
+volumes:
+  localstack_data:

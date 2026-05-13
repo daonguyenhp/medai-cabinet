@@ -1,0 +1,225 @@
+/* ─── Device Page ────────────────────────────────────────────── */
+.device-page { display: flex; flex-direction: column; gap: var(--space-5); }
+
+.device-header-card {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-6);
+  background: var(--color-surface);
+  border-radius: var(--radius-xl);
+  padding: var(--space-6) var(--space-8);
+  border: 1px solid var(--color-border-light);
+  box-shadow: var(--shadow-md);
+}
+
+.device-header-left { display: flex; align-items: center; gap: var(--space-5); }
+
+.device-status-icon {
+  width: 72px;
+  height: 72px;
+  border-radius: var(--radius-lg);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.device-status-icon.online  { background: var(--color-success-bg); color: var(--color-success); }
+.device-status-icon.offline { background: var(--color-bg);         color: var(--color-text-muted); }
+
+.device-name { font-size: var(--font-size-2xl); font-weight: 800; color: var(--color-primary); }
+.device-id-text { font-size: var(--font-size-sm); color: var(--color-text-muted); font-family: monospace; }
+
+.device-meta-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: var(--space-4);
+  margin-bottom: var(--space-3);
+}
+
+.device-meta-item { text-align: center; }
+
+.device-meta-label {
+  font-size: var(--font-size-xs);
+  color: var(--color-text-muted);
+  font-weight: 600;
+  text-transform: uppercase;
+  display: block;
+}
+
+.device-meta-value {
+  font-size: var(--font-size-base);
+  font-weight: 700;
+  color: var(--color-text-primary);
+}
+
+.device-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--space-5);
+}
+
+/* ─── Compartment Control ────────────────────────────────────── */
+.compartment-grid { display: flex; flex-direction: column; gap: var(--space-4); }
+
+.compartment-control {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-4);
+  padding: var(--space-4) var(--space-5);
+  background: var(--color-bg);
+  border-radius: var(--radius-md);
+  border: 2px solid var(--color-border-light);
+  transition: all var(--transition-fast);
+}
+
+.compartment-open { border-color: var(--color-warning); background: var(--color-warning-bg); }
+
+.compartment-num { font-size: var(--font-size-md); font-weight: 700; color: var(--color-text-primary); }
+.compartment-status-text { font-size: var(--font-size-sm); font-weight: 600; }
+.compartment-btns { display: flex; gap: var(--space-2); }
+
+/* ─── Command Grid ───────────────────────────────────────────── */
+.command-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: var(--space-3);
+}
+
+.command-btn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-4);
+  background: var(--color-bg);
+  border-radius: var(--radius-md);
+  border: 1.5px solid var(--color-border-light);
+  color: var(--color-text-primary);
+  font-size: var(--font-size-sm);
+  font-weight: 600;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  min-height: 80px;
+}
+
+.command-btn:hover:not(:disabled) {
+  background: var(--color-primary-50);
+  border-color: var(--color-primary);
+  color: var(--color-primary);
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-sm);
+}
+
+.command-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+
+.command-btn-warning:hover:not(:disabled) {
+  background: var(--color-warning-bg);
+  border-color: var(--color-warning);
+  color: var(--color-warning-dark);
+}
+
+.command-btn-danger:hover:not(:disabled) {
+  background: var(--color-danger-bg);
+  border-color: var(--color-danger);
+  color: var(--color-danger);
+}
+
+.command-icon { font-size: 28px; }
+
+/* ─── Environment Monitor ────────────────────────────────────── */
+.env-monitor { display: flex; flex-direction: column; gap: var(--space-5); }
+
+.env-status-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+}
+
+.env-gauges { display: flex; flex-direction: column; gap: var(--space-4); }
+.env-gauge  { display: flex; flex-direction: column; gap: var(--space-2); }
+
+.env-gauge-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.env-gauge-label {
+  font-size: var(--font-size-sm);
+  font-weight: 600;
+  color: var(--color-text-secondary);
+}
+
+.env-gauge-value {
+  font-size: var(--font-size-xl);
+  font-weight: 800;
+  font-family: 'Nunito', sans-serif;
+}
+
+.env-gauge-range {
+  display: flex;
+  justify-content: space-between;
+  font-size: var(--font-size-xs);
+  color: var(--color-text-muted);
+}
+
+.env-gauge-optimal { color: var(--color-success); font-weight: 600; }
+
+.env-stats {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: var(--space-3);
+}
+
+.env-stat {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-3) var(--space-4);
+  background: var(--color-bg);
+  border-radius: var(--radius-md);
+  border: 1px solid var(--color-border-light);
+}
+
+.env-stat-icon { font-size: 22px; }
+.env-stat-label { font-size: var(--font-size-xs); color: var(--color-text-muted); font-weight: 500; }
+.env-stat-value { font-size: var(--font-size-base); font-weight: 700; }
+
+.env-section-title {
+  font-size: var(--font-size-sm);
+  font-weight: 700;
+  color: var(--color-text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-bottom: var(--space-2);
+}
+
+.env-compartment-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: var(--space-3);
+}
+
+.env-compartment {
+  padding: var(--space-3);
+  background: var(--color-bg);
+  border-radius: var(--radius-md);
+  border: 2px solid var(--color-border-light);
+  text-align: center;
+  transition: all var(--transition-fast);
+}
+
+.env-compartment-open { border-color: var(--color-warning); background: var(--color-warning-bg); }
+.env-compartment-num  { font-size: var(--font-size-sm); font-weight: 700; color: var(--color-text-primary); margin-bottom: 4px; }
+.env-compartment-status { font-size: var(--font-size-xs); font-weight: 600; }
+
+/* ─── Responsive ─────────────────────────────────────────────── */
+@media (max-width: 1024px) {
+  .device-grid        { grid-template-columns: 1fr; }
+  .command-grid       { grid-template-columns: repeat(2, 1fr); }
+  .device-meta-grid   { grid-template-columns: repeat(2, 1fr); }
+}
