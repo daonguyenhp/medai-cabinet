@@ -54,11 +54,21 @@ async def dispense_from_device(device_id: str, command: DispenseCommand):
     try:
         await iot.send_dispense_command(
             device_id=device_id,
-            compartment=command.compartment,
+            slot=command.compartment,
             quantity=command.quantity,
             medication_id=command.medication_id or "manual"
         )
-        return {"message": f"Dispensing {command.quantity} from compartment {command.compartment}"}
+        return {"message": f"Dispensing {command.quantity} from slot {command.compartment}"}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@router.post("/{device_id}/ping")
+async def ping_device(device_id: str):
+    """Ping device — firmware replies with status='pong' on status topic."""
+    try:
+        await iot.send_ping(device_id)
+        return {"message": f"Ping sent to {device_id}"}
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 

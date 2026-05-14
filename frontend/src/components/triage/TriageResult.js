@@ -1,10 +1,27 @@
+import ReactMarkdown from 'react-markdown';
+import remarkGfm from 'remark-gfm';
 import '../../styles/triage.css';
 import { SEVERITY_DISPLAY } from '../../constants/triage.constants';
 
 export default function TriageResult({ result }) {
   if (!result) return null;
 
+  // Backend may return either:
+  //   - new flat shape: { analysis, urgency, should_see_doctor, model }
+  //   - legacy structured shape: { assessment, severity, recommendations[], warnings[], ... }
+  const isStructured = result.assessment !== undefined;
   const sev = SEVERITY_DISPLAY[result.severity] ?? SEVERITY_DISPLAY.unknown;
+
+  // Map urgency → severity-style label for the new shape
+  const urgencyLabel = (() => {
+    if (result.urgency === 'emergency') {
+      return { label: 'Khẩn cấp', icon: '🚨', badgeClass: 'badge-danger' };
+    }
+    if (result.urgency === 'normal') {
+      return { label: 'Bình thường', icon: '✅', badgeClass: 'badge-info' };
+    }
+    return null;
+  })();
 
   return (
     <div className="triage-result">
@@ -16,13 +33,23 @@ export default function TriageResult({ result }) {
           </svg>
           Kết quả phân tích AI
         </div>
-        <span className={`badge ${sev.badgeClass}`}>{sev.icon} Mức độ: {sev.label}</span>
+        {isStructured ? (
+          <span className={`badge ${sev.badgeClass}`}>{sev.icon} Mức độ: {sev.label}</span>
+        ) : urgencyLabel ? (
+          <span className={`badge ${urgencyLabel.badgeClass}`}>
+            {urgencyLabel.icon} {urgencyLabel.label}
+          </span>
+        ) : null}
       </div>
 
-      {/* Assessment */}
-      <div className="triage-assessment">{result.assessment}</div>
+      {/* Main analysis (markdown rendered) */}
+      <div className="triage-assessment triage-markdown">
+        <ReactMarkdown remarkPlugins={[remarkGfm]}>
+          {result.analysis || result.assessment || ''}
+        </ReactMarkdown>
+      </div>
 
-      {/* Recommendations */}
+      {/* Structured recommendations (legacy shape) */}
       {result.recommendations?.length > 0 && (
         <div className="triage-section">
           <div className="triage-section-title">💊 Thuốc đề xuất từ tủ của bạn</div>
@@ -44,7 +71,7 @@ export default function TriageResult({ result }) {
         </div>
       )}
 
-      {/* Warnings */}
+      {/* Structured warnings (legacy shape) */}
       {result.warnings?.length > 0 && (
         <div className="triage-section">
           <div className="triage-section-title">⚠️ Lưu ý quan trọng</div>
@@ -55,7 +82,7 @@ export default function TriageResult({ result }) {
       )}
 
       {/* See doctor */}
-      {result.see_doctor && (
+      {(result.see_doctor || result.should_see_doctor) && (
         <div className="alert alert-danger triage-doctor-alert">
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
             <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/>

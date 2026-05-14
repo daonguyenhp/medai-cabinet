@@ -1,14 +1,21 @@
 from fastapi import APIRouter, HTTPException, Query
 from typing import List, Optional
 import logging
+from pydantic import BaseModel
 
 from services.dynamodb import DynamoDBService
 from services.expiry_service import ExpiryService
+from services.sns_service import SNSService
 
 router = APIRouter()
 logger = logging.getLogger(__name__)
 db = DynamoDBService()
 expiry_service = ExpiryService()
+sns = SNSService()
+
+
+class CaregiverSubscribeRequest(BaseModel):
+    email: str
 
 
 @router.get("/")
@@ -60,4 +67,22 @@ async def check_medications(user_id: str = Query(...)):
 
         return {"medications_checked": len(medications), "alerts_created": alerts_created}
     except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@router.post("/caregiver/subscribe")
+async def subscribe_caregiver(request: CaregiverSubscribeRequest):
+    """Subscribe a caregiver email to receive missed-dose / device alerts.
+
+    AWS SNS will send a confirmation email to the address. The caregiver
+    must click the confirmation link before they actually start receiving
+    notifications.
+    """
+    try:
+        result = await sns.subscribe_caregiver_email(request.email)
+        return result
+    except RuntimeError as e:
+        raise HTTPException(status_code=400, detail=str(e))
+    except Exception as e:
+        logger.error(f"Caregiver subscribe error: {e}")
         raise HTTPException(status_code=500, detail=str(e))

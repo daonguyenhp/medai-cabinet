@@ -1,5 +1,8 @@
 from pydantic_settings import BaseSettings
 from typing import List
+from pathlib import Path
+
+_ENV_PATH = Path(__file__).resolve().parent / ".env"
 
 
 class Settings(BaseSettings):
@@ -34,6 +37,7 @@ class Settings(BaseSettings):
     IOT_KEY_PATH: str = "certs/medai-cabinet-device.private.key"
     IOT_CA_PATH: str = "certs/AmazonRootCA1.pem"
     IOT_CLIENT_ID: str = "medai-backend-server"
+    DEVICE_ID: str = "medai-001"  # Default device for single-device demo
 
     # SNS
     SNS_ALERT_TOPIC_ARN: str = ""
@@ -42,6 +46,11 @@ class Settings(BaseSettings):
     # Bedrock — default Llama 3 (matches .env)
     BEDROCK_MODEL_ID: str = "meta.llama3-1-8b-instruct-v1:0"
     BEDROCK_REGION: str = "us-east-1"
+
+    # AI Provider — "gemini" (free, recommended) or "bedrock"
+    AI_PROVIDER: str = "gemini"
+    GEMINI_API_KEY: str = ""
+    GEMINI_MODEL: str = "gemini-2.0-flash"
 
     # JWT
     JWT_SECRET_KEY: str = "change-this-in-production"
@@ -59,7 +68,7 @@ class Settings(BaseSettings):
     BATTERY_LOW: int = 20        # %
 
     class Config:
-        env_file = ".env"
+        env_file = str(_ENV_PATH)
         env_file_encoding = "utf-8"
 
 

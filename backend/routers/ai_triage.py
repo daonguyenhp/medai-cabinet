@@ -68,11 +68,36 @@ async def analyze_symptoms(request: TriageRequest):
 @router.post("/chat")
 async def chat(request: ChatRequest):
     try:
+        # Pull current medication list so the AI can answer with real data
+        # without forcing the user to list pills manually.
+        medications = await db.list_medications(request.user_id)
         result = await triage_service.chat(
             message=request.message,
-            conversation_history=request.conversation_history or []
+            conversation_history=request.conversation_history or [],
+            available_medications=medications,
         )
         return result
     except Exception as e:
         logger.error(f"Chat error: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@router.get("/refill-suggestions/{user_id}")
+async def refill_suggestions(user_id: str):
+    """
+    AI-powered shopping list:
+    Estimates which meds are low/expiring/running out based on dose history,
+    and asks the LLM to draft a friendly summary in Vietnamese.
+    """
+    try:
+        medications = await db.list_medications(user_id)
+        # Pull a generous slice of recent dose history for usage estimation
+        dose_history = await db.list_dose_history(user_id, limit=200)
+        result = await triage_service.suggest_refills(
+            medications=medications,
+            dose_history=dose_history,
+        )
+        return result
+    except Exception as e:
+        logger.error(f"Refill suggestions error: {e}")
         raise HTTPException(status_code=500, detail=str(e))

@@ -477,7 +477,7 @@ class MedAISetup:
         # IAM role for IoT → DynamoDB (AWS Academy provides LabRole)
         # Try common role names used in AWS Academy
         role_arn = None
-        for role_name in ["LabRole", "EMR_EC2_DefaultRole", "AWSServiceRoleForIoT"]:
+        for role_name in ["medai-iot-dynamodb-role", "LabRole", "EMR_EC2_DefaultRole", "AWSServiceRoleForIoT"]:
             try:
                 resp = self.iam.get_role(RoleName=role_name)
                 role_arn = resp["Role"]["Arn"]

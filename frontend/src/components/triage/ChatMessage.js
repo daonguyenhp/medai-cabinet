@@ -1,3 +1,5 @@
+import ReactMarkdown from 'react-markdown';
+import remarkGfm from 'remark-gfm';
 import '../../styles/triage.css';
 
 export default function ChatMessage({ message }) {
@@ -13,7 +15,15 @@ export default function ChatMessage({ message }) {
         </div>
       )}
       <div className={`chat-bubble ${isUser ? 'chat-bubble-user' : 'chat-bubble-ai'}`}>
-        {message.content}
+        {isUser ? (
+          message.content
+        ) : (
+          <div className="chat-markdown">
+            <ReactMarkdown remarkPlugins={[remarkGfm]}>
+              {message.content || ''}
+            </ReactMarkdown>
+          </div>
+        )}
       </div>
       {isUser && <div className="chat-avatar chat-avatar-user">Bạn</div>}
     </div>

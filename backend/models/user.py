@@ -6,6 +6,7 @@ class UserBase(BaseModel):
     name: str
     age: Optional[int] = None
     caregiver_phone: Optional[str] = None
+    caregiver_email: Optional[str] = None
     device_id: Optional[str] = None
 
 

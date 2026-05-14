@@ -11,6 +11,8 @@ from contextlib import asynccontextmanager
 
 from config import settings
 from routers import medications, schedules, devices, ai_triage, alerts, dashboard, iot
+from services.mqtt_subscriber import subscriber as mqtt_subscriber
+from services.dose_monitor import dose_monitor
 
 # Configure logging
 logging.basicConfig(
@@ -24,7 +26,19 @@ logger = logging.getLogger(__name__)
 async def lifespan(app: FastAPI):
     logger.info("MedAI Cabinet API starting up...")
     logger.info(f"Environment: {settings.ENVIRONMENT}")
+
+    # Start MQTT subscriber to listen for device telemetry/status/alerts
+    import asyncio
+    mqtt_subscriber.start(asyncio.get_running_loop())
+
+    # Start dose monitor (scans for missed doses every few minutes,
+    # alerts caregiver via SNS).
+    dose_monitor.start()
+
     yield
+
+    dose_monitor.stop()
+    mqtt_subscriber.stop()
     logger.info("MedAI Cabinet API shutting down...")
 
 
@@ -83,6 +97,39 @@ async def root():
 @app.get("/health")
 async def health_check():
     return {"status": "healthy", "environment": settings.ENVIRONMENT}
+
+
+@app.post("/api/v1/demo/dispense")
+async def demo_dispense(slot: int = 1, quantity: int = 1):
+    """Quick test: send dispense command to the default device.
+
+    Example:
+      curl -X POST 'http://localhost:8000/api/v1/demo/dispense?slot=1&quantity=2'
+    """
+    from services.aws_iot import IoTService
+    iot = IoTService()
+    await iot.send_dispense_command(
+        device_id=settings.DEVICE_ID,
+        slot=slot,
+        quantity=quantity,
+    )
+    return {"ok": True, "device_id": settings.DEVICE_ID, "slot": slot, "quantity": quantity}
+
+
+@app.post("/api/v1/demo/ping")
+async def demo_ping():
+    """Ping the default device — firmware will reply with status='pong'."""
+    from services.aws_iot import IoTService
+    iot = IoTService()
+    await iot.send_ping(settings.DEVICE_ID)
+    return {"ok": True, "device_id": settings.DEVICE_ID}
+
+
+@app.post("/api/v1/demo/scan-missed-doses")
+async def demo_scan_missed_doses():
+    """Manually trigger the missed-dose scanner (useful for demo)."""
+    await dose_monitor._scan()
+    return {"ok": True, "message": "Missed-dose scan completed"}
 
 
 

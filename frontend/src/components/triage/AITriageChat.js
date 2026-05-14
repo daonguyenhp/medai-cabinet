@@ -30,10 +30,11 @@ export default function AITriageChat({ userId }) {
       const result = await triageApi.analyze(userId, symptoms.trim());
       setTriageResult(result);
       setShowChat(true);
+      const aiText = result.analysis ?? result.assessment ?? 'Đã phân tích xong. Xem kết quả bên dưới.';
       setMessages((prev) => [
         ...prev,
         { role: 'user',      content: symptoms },
-        { role: 'assistant', content: result.assessment ?? 'Đã phân tích xong. Xem kết quả bên dưới.' },
+        { role: 'assistant', content: aiText },
       ]);
     } catch {
       toast.error('Không thể kết nối AI. Vui lòng thử lại.');

@@ -310,3 +310,146 @@
 @media (max-width: 768px) {
   .triage-sidebar { grid-template-columns: 1fr; }
 }
+
+/* ───── Markdown rendering for AI responses ────────────────────────────── */
+.chat-markdown,
+.triage-markdown {
+  line-height: 1.65;
+  word-break: break-word;
+}
+
+.chat-markdown > *:first-child,
+.triage-markdown > *:first-child {
+  margin-top: 0;
+}
+
+.chat-markdown > *:last-child,
+.triage-markdown > *:last-child {
+  margin-bottom: 0;
+}
+
+.chat-markdown p,
+.triage-markdown p {
+  margin: 0 0 10px;
+}
+
+.chat-markdown h1,
+.chat-markdown h2,
+.chat-markdown h3,
+.chat-markdown h4,
+.triage-markdown h1,
+.triage-markdown h2,
+.triage-markdown h3,
+.triage-markdown h4 {
+  margin: 14px 0 8px;
+  font-weight: 600;
+  line-height: 1.3;
+}
+.chat-markdown h1, .triage-markdown h1 { font-size: 1.25rem; }
+.chat-markdown h2, .triage-markdown h2 { font-size: 1.15rem; }
+.chat-markdown h3, .triage-markdown h3 { font-size: 1.05rem; }
+.chat-markdown h4, .triage-markdown h4 { font-size: 1rem; }
+
+.chat-markdown ul,
+.chat-markdown ol,
+.triage-markdown ul,
+.triage-markdown ol {
+  margin: 8px 0 12px;
+  padding-left: 22px;
+}
+
+.chat-markdown li,
+.triage-markdown li {
+  margin: 4px 0;
+}
+
+.chat-markdown li > p,
+.triage-markdown li > p {
+  margin: 0;
+}
+
+.chat-markdown strong,
+.triage-markdown strong {
+  font-weight: 600;
+  color: var(--color-text-primary, #111);
+}
+
+.chat-markdown em,
+.triage-markdown em {
+  font-style: italic;
+}
+
+.chat-markdown code,
+.triage-markdown code {
+  background: rgba(0, 0, 0, 0.06);
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-size: 0.9em;
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+}
+
+.chat-markdown pre,
+.triage-markdown pre {
+  background: rgba(0, 0, 0, 0.05);
+  padding: 10px 12px;
+  border-radius: 8px;
+  overflow-x: auto;
+  margin: 10px 0;
+}
+
+.chat-markdown pre code,
+.triage-markdown pre code {
+  background: transparent;
+  padding: 0;
+}
+
+.chat-markdown blockquote,
+.triage-markdown blockquote {
+  border-left: 3px solid var(--color-primary, #4a90e2);
+  margin: 10px 0;
+  padding: 4px 12px;
+  color: var(--color-text-secondary, #555);
+  background: rgba(74, 144, 226, 0.06);
+  border-radius: 0 6px 6px 0;
+}
+
+.chat-markdown hr,
+.triage-markdown hr {
+  border: none;
+  border-top: 1px solid rgba(0, 0, 0, 0.1);
+  margin: 14px 0;
+}
+
+.chat-markdown a,
+.triage-markdown a {
+  color: var(--color-primary, #4a90e2);
+  text-decoration: underline;
+}
+
+.chat-markdown table,
+.triage-markdown table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 10px 0;
+  font-size: 0.95em;
+}
+
+.chat-markdown th,
+.chat-markdown td,
+.triage-markdown th,
+.triage-markdown td {
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  padding: 6px 10px;
+  text-align: left;
+}
+
+.chat-markdown th,
+.triage-markdown th {
+  background: rgba(0, 0, 0, 0.04);
+  font-weight: 600;
+}
+
+/* AI bubble white-space normalization (override pre-wrap so markdown lists render cleanly) */
+.chat-bubble-ai {
+  white-space: normal;
+}

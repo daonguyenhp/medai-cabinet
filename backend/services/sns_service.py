@@ -64,3 +64,28 @@ class SNSService:
         )
         await self.notify_caregiver(user_id=user_id, subject=subject, message=message)
         await self.notify_alert(subject=subject, message=message)
+
+    async def subscribe_caregiver_email(self, email: str) -> dict:
+        """Subscribe an email address to the caregiver SNS topic.
+
+        AWS will send a confirmation email; the caregiver must click the
+        link before they actually receive notifications.
+        """
+        if not settings.SNS_CAREGIVER_TOPIC_ARN:
+            raise RuntimeError("SNS_CAREGIVER_TOPIC_ARN not configured")
+        resp = self.client.subscribe(
+            TopicArn=settings.SNS_CAREGIVER_TOPIC_ARN,
+            Protocol="email",
+            Endpoint=email,
+            ReturnSubscriptionArn=True,
+        )
+        logger.info(f"Subscribed caregiver email {email} to caregiver topic")
+        return {
+            "subscription_arn": resp.get("SubscriptionArn"),
+            "email": email,
+            "status": "PendingConfirmation",
+            "message": (
+                "Email xác nhận đã được gửi. "
+                "Vui lòng mở email và click link xác nhận để nhận thông báo."
+            ),
+        }

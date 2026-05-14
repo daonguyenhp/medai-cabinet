@@ -71,12 +71,13 @@ async def dispense_medication(medication_id: str, request: DispenseRequest):
         if device_id:
             await iot.send_dispense_command(
                 device_id=device_id,
-                compartment=med.get("compartment", 1),
+                slot=med.get("compartment", 1),
                 quantity=request.quantity,
                 medication_id=medication_id
             )
 
-        # Update stock
+        # Optimistic stock update. Firmware will publish the real inventory via
+        # telemetry after the dispense completes; iot.py will reconcile.
         new_stock = med.get("stock_count", 0) - request.quantity
         await db.update_medication(medication_id, {"stock_count": new_stock})
 
@@ -85,4 +86,34 @@ async def dispense_medication(medication_id: str, request: DispenseRequest):
         raise
     except Exception as e:
         logger.error(f"Error dispensing medication: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@router.post("/{medication_id}/sync-inventory")
+async def sync_inventory_to_device(medication_id: str):
+    """Push current stock_count to the firmware's inventory counter.
+
+    Call this after refilling pills so the firmware knows the real count.
+    """
+    try:
+        med = await db.get_medication(medication_id)
+        if not med:
+            raise HTTPException(status_code=404, detail="Medication not found")
+
+        device_id = await db.get_user_device(med.get("user_id"))
+        if not device_id:
+            raise HTTPException(status_code=400, detail="User has no device")
+
+        await iot.send_set_inventory(
+            device_id=device_id,
+            slot=med.get("compartment", 1),
+            count=med.get("stock_count", 0),
+        )
+        return {"message": "Inventory synced to device",
+                "slot": med.get("compartment"),
+                "count": med.get("stock_count", 0)}
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"Error syncing inventory: {e}")
         raise HTTPException(status_code=500, detail=str(e))
