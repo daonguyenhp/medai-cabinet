@@ -4,6 +4,7 @@ import { useApp } from '../App';
 import { useDashboard } from '../hooks';
 import DoseAlert from '../components/schedule/DoseAlert';
 import EnvironmentMonitor from '../components/device/EnvironmentMonitor';
+import RefillSuggestionsCard from '../components/dashboard/RefillSuggestionsCard';
 import { schedulesApi } from '../api';
 import toast from 'react-hot-toast';
 import '../styles/dashboard.css';
@@ -203,6 +204,9 @@ export default function Dashboard() {
               </div>
             </div>
           </div>
+
+          {/* AI-powered shopping list */}
+          <RefillSuggestionsCard userId={user.user_id} />
         </div>
       </div>
 

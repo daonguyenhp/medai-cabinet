@@ -3,6 +3,7 @@ import toast from 'react-hot-toast';
 import { useApp } from '../App';
 import { useAlerts } from '../hooks';
 import { SEVERITY_CONFIG, ALERT_TYPE_ICONS } from '../constants/alert.constants';
+import CaregiverSubscribeCard from '../components/alerts/CaregiverSubscribeCard';
 import '../styles/alerts.css';
 
 const VIEW_FILTERS = [
@@ -89,6 +90,9 @@ export default function Alerts() {
           </button>
         ))}
       </div>
+
+      {/* Caregiver subscription form */}
+      <CaregiverSubscribeCard />
 
       {/* List */}
       {loading ? (

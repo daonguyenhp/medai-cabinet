@@ -96,3 +96,29 @@
 }
 
 .alert-resolve-btn { flex-shrink: 0; }
+
+/* ───── Caregiver subscribe card ─────────────────────────────────────────── */
+.caregiver-card {
+  margin-bottom: 20px;
+}
+
+.caregiver-form {
+  display: flex;
+  gap: 8px;
+  align-items: stretch;
+  flex-wrap: wrap;
+}
+
+.caregiver-form .form-control {
+  flex: 1;
+  min-width: 240px;
+}
+
+.caregiver-pending {
+  margin-top: 14px;
+  font-size: 0.92rem;
+}
+
+.caregiver-pending p {
+  font-size: 0.88rem;
+}

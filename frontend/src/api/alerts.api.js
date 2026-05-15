@@ -20,4 +20,7 @@ export const alertsApi = {
 
   checkMedications: (userId) =>
     client.post(`${BASE}/check-medications`, null, { params: { user_id: userId } }).then((r) => r.data),
+
+  subscribeCaregiver: (email) =>
+    client.post(`${BASE}/caregiver/subscribe`, { email }).then((r) => r.data),
 };

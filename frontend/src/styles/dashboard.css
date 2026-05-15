@@ -186,3 +186,85 @@
   .dashboard-welcome { flex-direction: column; }
   .triage-info-banner { flex-direction: column; text-align: center; }
 }
+
+/* ───── Refill suggestions card (AI shopping list) ───────────────────────── */
+.refill-card .refill-ai-badge {
+  font-size: 0.7rem;
+  margin-left: 6px;
+  padding: 2px 6px;
+}
+
+.refill-loading {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 16px 0;
+  color: var(--color-text-muted);
+}
+
+.refill-empty {
+  text-align: center;
+  padding: 16px 8px;
+}
+
+.refill-empty p {
+  margin-top: 8px;
+  color: var(--color-text-muted);
+}
+
+.refill-summary {
+  margin: 0 0 12px;
+  font-size: 0.95rem;
+  line-height: 1.5;
+  color: var(--color-text-primary);
+  background: var(--color-primary-50, rgba(74, 144, 226, 0.08));
+  padding: 10px 12px;
+  border-radius: var(--radius-md, 8px);
+  border-left: 3px solid var(--color-primary, #4a90e2);
+}
+
+.refill-list {
+  list-style: none;
+  margin: 0 0 12px;
+  padding: 0;
+}
+
+.refill-item {
+  padding: 10px 0;
+  border-top: 1px solid var(--color-border-light, rgba(0, 0, 0, 0.06));
+}
+
+.refill-item:first-child {
+  border-top: none;
+}
+
+.refill-item-main {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.refill-item-name {
+  font-weight: 600;
+  color: var(--color-text-primary);
+}
+
+.refill-item-stock {
+  font-size: 0.9rem;
+  color: var(--color-text-muted);
+}
+
+.refill-item-meta {
+  display: flex;
+  gap: 14px;
+  margin-top: 4px;
+  font-size: 0.85rem;
+  color: var(--color-text-muted);
+  flex-wrap: wrap;
+}
+
+.refill-link {
+  display: inline-block;
+}

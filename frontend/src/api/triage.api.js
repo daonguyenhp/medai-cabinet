@@ -13,4 +13,7 @@ export const triageApi = {
     client
       .post(`${BASE}/chat`, { user_id: userId, message, conversation_history: conversationHistory })
       .then((r) => r.data),
+
+  refillSuggestions: (userId) =>
+    client.get(`${BASE}/refill-suggestions/${userId}`).then((r) => r.data),
 };
