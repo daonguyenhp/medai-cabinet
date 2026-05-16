@@ -6,20 +6,26 @@
 #include "config.h"
 
 // ----------------------------------------
+// Module state
+// ----------------------------------------
+// Prevent concurrent dispense commands. Set true while motor is running.
+static volatile bool isDispensing = false;
+
+// ----------------------------------------
 // Private helpers
 // ----------------------------------------
 
 static void openSlot(int slot) {
     Serial.print("[Dispenser] Opening slot ");
     Serial.println(slot + 1);
-    rotateStepper(slot, STEPS_QUARTER_TURN);
-    powerOffStepper(slot);  // cut coil power after moving
+    rotateStepper(slot, STEPS_HALF_ROTATION);  // rotate 180 degrees to expose pill
+    powerOffStepper(slot);                     // cut coil power after moving
 }
 
 static void closeSlot(int slot) {
     Serial.print("[Dispenser] Closing slot ");
     Serial.println(slot + 1);
-    rotateStepper(slot, -STEPS_QUARTER_TURN);
+    rotateStepper(slot, STEPS_HALF_ROTATION);  // rotate another 180 (back to home, total 360)
     powerOffStepper(slot);
 }
 
@@ -28,6 +34,13 @@ static void closeSlot(int slot) {
 // ----------------------------------------
 
 DispenseResult dispenseSinglePill(int slot) {
+
+    // Validate slot range (defensive)
+    if (slot < 0 || slot >= MAX_SLOTS) {
+        Serial.print("[Dispenser] Invalid slot index: ");
+        Serial.println(slot);
+        return DISPENSE_INVALID_SLOT;
+    }
 
     Serial.println("-----------------------------");
     Serial.print("[Dispenser] Dispensing from slot ");
@@ -56,26 +69,17 @@ DispenseResult dispenseSinglePill(int slot) {
         bool pillDetected = waitForPillDrop(PILL_DETECT_TIMEOUT_MS);
 
         if (!pillDetected) {
-            // No pill detected — close and retry
-            Serial.println("[Dispenser] No pill detected after opening, closing and retrying");
+            Serial.println("[Dispenser] No pill detected, closing and retrying");
             closeSlot(slot);
-            delay(500);
+            delay(RETRY_DELAY_MS);
             continue;
         }
 
         // Pill successfully dropped — update inventory
         decreaseInventory(slot);
 
-        // Close slot
+        // Close slot (return disk to home position)
         closeSlot(slot);
-
-        // Wait for person to pick up the pill
-        bool pickedUp = waitForPillPickup(PILL_PICKUP_TIMEOUT_MS);
-
-        if (!pickedUp) {
-            Serial.println("[Dispenser] WARNING: Pill not picked up within timeout");
-            return DISPENSE_NOT_PICKED_UP;
-        }
 
         Serial.println("[Dispenser] Dispense complete");
         return DISPENSE_OK;
@@ -88,10 +92,19 @@ DispenseResult dispenseSinglePill(int slot) {
 
 bool dispensePills(int slot, int quantity) {
 
+    // Reject concurrent dispense
+    if (isDispensing) {
+        Serial.println("[Dispenser] BUSY — another dispense in progress");
+        return false;
+    }
+    isDispensing = true;
+
     Serial.print("[Dispenser] Dispensing ");
     Serial.print(quantity);
     Serial.print(" pill(s) from slot ");
     Serial.println(slot + 1);
+
+    bool success = true;
 
     for (int i = 0; i < quantity; i++) {
 
@@ -107,7 +120,8 @@ bool dispensePills(int slot, int quantity) {
             Serial.print(i + 1);
             Serial.print(" — reason: ");
             Serial.println(dispenseResultToString(result));
-            return false;
+            success = false;
+            break;
         }
 
         // Delay between pills (not after the last one)
@@ -116,8 +130,12 @@ bool dispensePills(int slot, int quantity) {
         }
     }
 
-    Serial.println("[Dispenser] All pills dispensed successfully");
-    return true;
+    if (success) {
+        Serial.println("[Dispenser] All pills dispensed successfully");
+    }
+
+    isDispensing = false;
+    return success;
 }
 
 const char* dispenseResultToString(DispenseResult result) {
@@ -125,7 +143,7 @@ const char* dispenseResultToString(DispenseResult result) {
         case DISPENSE_OK:           return "ok";
         case DISPENSE_EMPTY:        return "empty";
         case DISPENSE_JAM:          return "jam";
-        case DISPENSE_NOT_PICKED_UP: return "not_picked_up";
+        case DISPENSE_INVALID_SLOT: return "invalid_slot";
         default:                    return "unknown";
     }
 }

@@ -3,10 +3,10 @@
 
 // Result codes for dispense operations
 enum DispenseResult {
-    DISPENSE_OK,              // pill dispensed and picked up successfully
+    DISPENSE_OK,              // pill dispensed successfully
     DISPENSE_EMPTY,           // slot has no pills
     DISPENSE_JAM,             // motor ran but IR never detected a pill
-    DISPENSE_NOT_PICKED_UP,   // pill dropped but person didn't pick it up
+    DISPENSE_INVALID_SLOT,    // slot index out of range
 };
 
 // Dispense one pill from a given slot.

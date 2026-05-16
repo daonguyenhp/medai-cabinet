@@ -5,12 +5,9 @@
 void initIRSensor();
 
 // Wait until a pill is detected falling through the drop point.
+// Uses debouncing to avoid false positives.
 // Returns true if detected within timeout, false if timed out.
 bool waitForPillDrop(unsigned long timeoutMs);
-
-// Wait until the person picks up the pill (sensor clears).
-// Returns true if cleared within timeout.
-bool waitForPillPickup(unsigned long timeoutMs);
 
 // Raw read — true if pill is currently blocking the sensor
 bool isPillPresent();

@@ -14,4 +14,5 @@ void publishStatus(const char* status);
 void publishAlert(const char* alertType, const char* detail);
 void publishInventory();
 
+void publishTelemetry(float temperature, float humidity);
 #endif

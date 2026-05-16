@@ -1,9 +1,10 @@
+#include <Arduino.h>
 #include <PubSubClient.h>
 #include <ArduinoJson.h>
+#include <math.h>
 #include "mqtt_manager.h"
 #include "dispenser.h"
 #include "inventory.h"
-#include "stepper.h"
 #include "config.h"
 
 PubSubClient mqttClient;
@@ -60,12 +61,12 @@ static void handleDispense(JsonDocument& doc) {
         return;
     }
 
-    int slotIndex = slot - 1;  // convert to 0-based
+    int slotIndex = slot - 1;
 
     // Validate quantity
-    if (quantity < 1 || quantity > 10) {
+    if (quantity < 1 || quantity > MAX_DISPENSE_QUANTITY) {
         Serial.println("[MQTT] Invalid quantity");
-        publishAlert("invalid_quantity", "quantity must be 1-10");
+        publishAlert("invalid_quantity", "quantity out of range");
         publishStatus("failed");
         return;
     }
@@ -83,13 +84,8 @@ static void handleDispense(JsonDocument& doc) {
 
     bool success = dispensePills(slotIndex, quantity);
 
-    if (success) {
-        publishStatus("completed");
-        publishInventory();  // send updated inventory after dispense
-    } else {
-        publishStatus("failed");
-        publishInventory();
-    }
+    publishStatus(success ? "completed" : "failed");
+    publishInventory();  // always sync inventory after dispense
 }
 
 /*
@@ -125,37 +121,6 @@ static void handleSetInventory(JsonDocument& doc) {
 static void handlePing() {
     Serial.println("[MQTT] Command: ping");
     publishStatus("pong");
-}
-
-/*
-  Expected MQTT command payload — "test_motor":
-  Bypass IR, inventory, retry — just rotate motor to verify hardware.
-  {
-    "command": "test_motor",
-    "slot": 1,           ← 1-based (1, 2, or 3)
-    "steps": 512         ← optional, default 512 (quarter turn). Negative = reverse
-  }
-*/
-static void handleTestMotor(JsonDocument& doc) {
-
-    int slot  = doc["slot"]  | -1;
-    int steps = doc["steps"] | STEPS_QUARTER_TURN;
-
-    Serial.println("[MQTT] Command: test_motor");
-    Serial.print("[MQTT] Slot: ");
-    Serial.print(slot);
-    Serial.print(", Steps: ");
-    Serial.println(steps);
-
-    if (slot < 1 || slot > MAX_SLOTS) {
-        publishAlert("invalid_slot", "slot must be 1, 2, or 3");
-        return;
-    }
-
-    publishStatus("test_motor_running");
-    rotateStepper(slot - 1, steps);
-    powerOffStepper(slot - 1);
-    publishStatus("test_motor_done");
 }
 
 // ----------------------------------------
@@ -194,19 +159,12 @@ static void mqttCallback(char* topic, byte* payload, unsigned int length) {
         return;
     }
 
-    // Route to correct handler
     if (strcmp(command, "dispense") == 0) {
         handleDispense(doc);
-
     } else if (strcmp(command, "set_inventory") == 0) {
         handleSetInventory(doc);
-
     } else if (strcmp(command, "ping") == 0) {
         handlePing();
-
-    } else if (strcmp(command, "test_motor") == 0) {
-        handleTestMotor(doc);
-
     } else {
         Serial.print("[MQTT] Unknown command: ");
         Serial.println(command);
@@ -254,31 +212,15 @@ bool connectMQTT() {
     bool subResult = mqttClient.subscribe(MQTT_COMMAND_TOPIC);
     Serial.print("[MQTT] Subscribe to command topic: ");
     Serial.println(subResult ? "OK" : "FAILED");
-    Serial.print("[MQTT] Subscribed topic name: '");
-    Serial.print(MQTT_COMMAND_TOPIC);
-    Serial.println("'");
 
     publishStatus("online");
     publishInventory();
-
-    // Self-test: publish to our own command topic to verify subscribe works.
-    // If we receive this message back, the subscribe + receive path is OK
-    // and any later issue is purely a topic-name mismatch from the AWS Console.
-    Serial.println("[MQTT] === SELF-TEST: publishing ping to own command topic ===");
-    bool selfTest = mqttClient.publish(MQTT_COMMAND_TOPIC, "{\"command\":\"ping\"}");
-    Serial.print("[MQTT] Self-test publish: ");
-    Serial.println(selfTest ? "OK" : "FAILED");
 
     return true;
 }
 
 void mqttLoop() {
-
-    if (!mqttClient.connected()) {
-        Serial.print("[MQTT] Disconnected — state: ");
-        Serial.println(stateToString(mqttClient.state()));
-    }
-
+    // Process incoming messages. Reconnection handled by main loop.
     mqttClient.loop();
 }
 
@@ -289,7 +231,11 @@ void publishStatus(const char* status) {
     doc["status"] = status;
 
     char buffer[128];
-    serializeJson(doc, buffer);
+    size_t n = serializeJson(doc, buffer, sizeof(buffer));
+    if (n == 0) {
+        Serial.println("[MQTT] publishStatus: buffer overflow");
+        return;
+    }
 
     bool ok = mqttClient.publish(MQTT_STATUS_TOPIC, buffer);
     Serial.print("[MQTT] publishStatus('");
@@ -306,7 +252,11 @@ void publishAlert(const char* alertType, const char* detail) {
     doc["detail"] = detail;
 
     char buffer[200];
-    serializeJson(doc, buffer);
+    size_t n = serializeJson(doc, buffer, sizeof(buffer));
+    if (n == 0) {
+        Serial.println("[MQTT] publishAlert: buffer overflow");
+        return;
+    }
 
     bool ok = mqttClient.publish(MQTT_ALERT_TOPIC, buffer);
     Serial.print("[MQTT] publishAlert('");
@@ -315,9 +265,14 @@ void publishAlert(const char* alertType, const char* detail) {
     Serial.println(ok ? "OK" : "FAILED");
 }
 
+// Wrapper: inventory-only telemetry (no env sensor data)
 void publishInventory() {
+    publishTelemetry(NAN, NAN);
+}
 
-    StaticJsonDocument<200> doc;
+void publishTelemetry(float temperature, float humidity) {
+
+    StaticJsonDocument<300> doc;
     doc["device"] = DEVICE_ID;
 
     JsonObject inv = doc.createNestedObject("inventory");
@@ -325,11 +280,24 @@ void publishInventory() {
     inv["slot2"] = getInventory(1);
     inv["slot3"] = getInventory(2);
 
-    char buffer[200];
-    serializeJson(doc, buffer);
+    if (!isnan(temperature)) {
+        doc["temperature"] = round(temperature * 10) / 10.0;
+    }
+    if (!isnan(humidity)) {
+        doc["humidity"] = round(humidity * 10) / 10.0;
+    }
+
+    doc["uptime_s"] = millis() / 1000;
+
+    char buffer[300];
+    size_t n = serializeJson(doc, buffer, sizeof(buffer));
+    if (n == 0) {
+        Serial.println("[MQTT] publishTelemetry: buffer overflow");
+        return;
+    }
 
     bool ok = mqttClient.publish(MQTT_TELEMETRY_TOPIC, buffer);
-    Serial.print("[MQTT] publishInventory: ");
-    Serial.println(ok ? "OK" : "FAILED");
+    Serial.print("[MQTT] publishTelemetry: ");
     Serial.println(buffer);
+    Serial.println(ok ? "[MQTT] Telemetry OK" : "[MQTT] Telemetry FAILED");
 }
