@@ -1,6 +1,7 @@
 #include <Arduino.h>
 #include <PubSubClient.h>
 #include <ArduinoJson.h>
+#include <WiFi.h>
 #include <math.h>
 #include "mqtt_manager.h"
 #include "dispenser.h"
@@ -272,7 +273,7 @@ void publishInventory() {
 
 void publishTelemetry(float temperature, float humidity) {
 
-    StaticJsonDocument<300> doc;
+    StaticJsonDocument<512> doc;
     doc["device"] = DEVICE_ID;
 
     JsonObject inv = doc.createNestedObject("inventory");
@@ -287,9 +288,16 @@ void publishTelemetry(float temperature, float humidity) {
         doc["humidity"] = round(humidity * 10) / 10.0;
     }
 
+    // WiFi connection details — surfaced on the dashboard
+    if (WiFi.status() == WL_CONNECTED) {
+        doc["wifi_ssid"] = WiFi.SSID();
+        doc["wifi_rssi"] = WiFi.RSSI();
+        doc["wifi_ip"]   = WiFi.localIP().toString();
+    }
+
     doc["uptime_s"] = millis() / 1000;
 
-    char buffer[300];
+    char buffer[512];
     size_t n = serializeJson(doc, buffer, sizeof(buffer));
     if (n == 0) {
         Serial.println("[MQTT] publishTelemetry: buffer overflow");

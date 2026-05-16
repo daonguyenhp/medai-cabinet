@@ -40,7 +40,6 @@ export function useDevice(userId, deviceId) {
             }),
             temp: t.temperature,
             humidity: t.humidity,
-            battery: t.battery_level,
           })),
       );
     } catch {

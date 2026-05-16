@@ -5,8 +5,8 @@
 // WIFI
 // ==========================
 
-#define WIFI_SSID       "DOAN-HOI CSE"
-#define WIFI_PASSWORD   "Doanhoilanha"
+#define WIFI_SSID       "OREO"
+#define WIFI_PASSWORD   "99999999"
 
 // ==========================
 // AWS MQTT
@@ -69,8 +69,8 @@
 // Quarter rotation = 512 steps
 // ==========================
 
-#define STEPS_QUARTER_TURN  512     // open/close one slot
-#define STEPS_HALF_ROTATION 1024    // rotate 180 degrees to open/close
+#define STEPS_QUARTER_TURN  1024     // open/close one slot
+#define STEPS_HALF_ROTATION 2048    // rotate 180 degrees to open/close
 #define STEP_DELAY_MS       2       // ms between steps (speed)
 
 // ==========================

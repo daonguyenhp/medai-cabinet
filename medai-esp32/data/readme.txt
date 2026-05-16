@@ -1,1 +1,0 @@
-put your amazonCA1, private, cert.key.crt file here, rename them to AmazonCA1, private.pem.key, device.pem.crt

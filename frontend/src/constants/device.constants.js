@@ -9,8 +9,9 @@ export const DEMO_TELEMETRY = {
   timestamp: new Date().toISOString(),
   temperature: 26.5,
   humidity: 58.2,
-  battery_level: 85,
+  wifi_ssid: 'LongChau-Home',
   wifi_rssi: -65,
+  wifi_ip: '192.168.1.42',
   firmware_version: '1.2.0',
   uptime_seconds: 86400,
   free_heap: 180000,
@@ -25,7 +26,6 @@ export const DEMO_TELEMETRY_HISTORY = Array.from({ length: 24 }, (_, i) => ({
   time: `${String(i).padStart(2, '0')}:00`,
   temp: parseFloat((25 + Math.random() * 3).toFixed(1)),
   humidity: parseFloat((55 + Math.random() * 10).toFixed(1)),
-  battery: parseFloat((85 - i * 0.2).toFixed(1)),
 }));
 
 export const DEMO_DASHBOARD = {
@@ -39,7 +39,7 @@ export const DEMO_DASHBOARD = {
   },
   adherence: { rate_7d: 82, label: 'Tốt' },
   alerts: { unresolved: 3, by_severity: { info: 1, warning: 2, critical: 0 }, recent: [] },
-  device: { online: false, temperature: 26.5, humidity: 58, battery_level: 85 },
+  device: { online: false, temperature: 26.5, humidity: 58, wifi_ssid: 'LongChau-Home', wifi_rssi: -65, wifi_ip: '192.168.1.42' },
 };
 
 export const WIFI_STRENGTH_LEVELS = [

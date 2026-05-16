@@ -30,18 +30,30 @@ function GaugeBar({ value, min, max, warningMin, warningMax, unit, label }) {
 }
 
 function getWifiStrength(rssi) {
-  if (!rssi) return { label: 'Không có', colorClass: 'text-muted' };
+  if (rssi == null) return { label: 'Không có', colorClass: 'text-muted' };
   return (
     WIFI_STRENGTH_LEVELS.find((l) => rssi >= l.threshold) ??
     WIFI_STRENGTH_LEVELS[WIFI_STRENGTH_LEVELS.length - 1]
   );
 }
 
+function formatUptimeShort(seconds) {
+  if (!seconds) return '--';
+  const d = Math.floor(seconds / 86400);
+  const h = Math.floor((seconds % 86400) / 3600);
+  const m = Math.floor((seconds % 3600) / 60);
+  if (d > 0) return `${d}n ${h}h`;
+  if (h > 0) return `${h}h ${m}m`;
+  return `${m}m`;
+}
+
 export default function EnvironmentMonitor({ telemetry, isOnline }) {
   const temp     = telemetry?.temperature;
   const humidity = telemetry?.humidity;
-  const battery  = telemetry?.battery_level;
   const rssi     = telemetry?.wifi_rssi;
+  const ssid     = telemetry?.wifi_ssid;
+  const ip       = telemetry?.wifi_ip;
+  const uptime   = telemetry?.uptime_s ?? telemetry?.uptime_seconds;
 
   const tempOk     = temp     != null && temp     >= 15 && temp     <= 30;
   const humidityOk = humidity != null && humidity >= 30 && humidity <= 70;
@@ -67,38 +79,53 @@ export default function EnvironmentMonitor({ telemetry, isOnline }) {
         <GaugeBar value={humidity} min={0}  max={100} warningMin={30} warningMax={70} unit="%"  label="Độ ẩm" />
       </div>
 
-      {/* Quick stats */}
+      {/* WiFi connection card — replaces the old battery tile */}
+      <div className="env-wifi-card">
+        <div className="env-wifi-icon" aria-hidden="true">
+          <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <path d="M5 12.55a11 11 0 0 1 14.08 0"/>
+            <path d="M1.42 9a16 16 0 0 1 21.16 0"/>
+            <path d="M8.53 16.11a6 6 0 0 1 6.95 0"/>
+            <line x1="12" y1="20" x2="12.01" y2="20"/>
+          </svg>
+        </div>
+        <div className="env-wifi-body">
+          <div className="env-wifi-row">
+            <span className="env-wifi-label">Mạng WiFi</span>
+            <span className={`env-wifi-strength ${wifiInfo.colorClass}`}>
+              {wifiInfo.label}{rssi != null ? ` · ${rssi} dBm` : ''}
+            </span>
+          </div>
+          <div className="env-wifi-ssid" title={ssid || ''}>
+            {ssid ?? (isOnline ? 'Đang kết nối…' : 'Chưa kết nối')}
+          </div>
+          {ip && <div className="env-wifi-ip">IP: <code>{ip}</code></div>}
+        </div>
+      </div>
+
+      {/* Compact secondary info — pharmacy-style row */}
       <div className="env-stats">
         <div className="env-stat">
-          <div className="env-stat-icon">🔋</div>
-          <div>
-            <div className="env-stat-label">Pin</div>
-            <div className={`env-stat-value ${battery <= 20 ? 'text-danger' : battery <= 50 ? 'text-warning' : 'text-success'}`}>
-              {battery != null ? `${battery}%` : '--'}
-            </div>
-          </div>
-        </div>
-        <div className="env-stat">
-          <div className="env-stat-icon">📶</div>
-          <div>
-            <div className="env-stat-label">WiFi</div>
-            <div className={`env-stat-value ${wifiInfo.colorClass}`}>{wifiInfo.label}</div>
-          </div>
-        </div>
-        <div className="env-stat">
-          <div className="env-stat-icon">🌡️</div>
+          <div className="env-stat-icon" aria-hidden="true">🌡️</div>
           <div>
             <div className="env-stat-label">Bảo quản</div>
             <div className={`env-stat-value ${tempOk && humidityOk ? 'text-success' : 'text-warning'}`}>
-              {tempOk && humidityOk ? 'Tốt' : 'Cần kiểm tra'}
+              {temp == null && humidity == null ? '--' : tempOk && humidityOk ? 'Tốt' : 'Cần kiểm tra'}
             </div>
           </div>
         </div>
         <div className="env-stat">
-          <div className="env-stat-icon">⚙️</div>
+          <div className="env-stat-icon" aria-hidden="true">⏱️</div>
+          <div>
+            <div className="env-stat-label">Thời gian hoạt động</div>
+            <div className="env-stat-value">{formatUptimeShort(uptime)}</div>
+          </div>
+        </div>
+        <div className="env-stat">
+          <div className="env-stat-icon" aria-hidden="true">⚙️</div>
           <div>
             <div className="env-stat-label">Firmware</div>
-            <div className="env-stat-value text-muted">{telemetry?.firmware_version ?? '--'}</div>
+            <div className="env-stat-value text-muted">{telemetry?.firmware_version ?? 'v1.1'}</div>
           </div>
         </div>
       </div>

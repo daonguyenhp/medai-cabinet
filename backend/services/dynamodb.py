@@ -25,6 +25,19 @@ def _convert_decimals(obj):
     return obj
 
 
+def _floats_to_decimals(obj):
+    """Recursively convert Python floats to Decimal for DynamoDB writes.
+    DynamoDB rejects native floats; Decimal is required."""
+    if isinstance(obj, list):
+        return [_floats_to_decimals(i) for i in obj]
+    elif isinstance(obj, dict):
+        return {k: _floats_to_decimals(v) for k, v in obj.items()}
+    elif isinstance(obj, float):
+        # Round-trip through str to avoid binary-float artifacts (e.g. 28.9 → 28.8999...)
+        return Decimal(str(obj))
+    return obj
+
+
 def _now_iso() -> str:
     return datetime.utcnow().isoformat() + "Z"
 

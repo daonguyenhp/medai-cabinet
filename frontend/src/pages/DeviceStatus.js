@@ -62,9 +62,14 @@ export default function DeviceStatus() {
           <div className="device-meta-grid">
             {[
               { label: 'Firmware', value: telemetry?.firmware_version ?? '--' },
-              { label: 'Uptime',   value: telemetry?.uptime_seconds ? formatUptime(telemetry.uptime_seconds) : '--' },
-              { label: 'WiFi',     value: telemetry?.wifi_rssi ? `${telemetry.wifi_rssi} dBm` : '--' },
-              { label: 'Bộ nhớ',  value: telemetry?.free_heap ? `${Math.round(telemetry.free_heap / 1024)}KB` : '--' },
+              { label: 'Uptime',   value: (telemetry?.uptime_seconds ?? telemetry?.uptime_s) ? formatUptime(telemetry?.uptime_seconds ?? telemetry?.uptime_s) : '--' },
+              {
+                label: 'WiFi',
+                value: telemetry?.wifi_ssid
+                  ? `${telemetry.wifi_ssid}${telemetry.wifi_rssi != null ? ` (${telemetry.wifi_rssi} dBm)` : ''}`
+                  : telemetry?.wifi_rssi != null ? `${telemetry.wifi_rssi} dBm` : '--',
+              },
+              { label: 'IP',       value: telemetry?.wifi_ip ?? '--' },
             ].map((item) => (
               <div key={item.label} className="device-meta-item">
                 <span className="device-meta-label">{item.label}</span>
@@ -173,7 +178,6 @@ export default function DeviceStatus() {
                 <Legend />
                 <Line type="monotone" dataKey="temp"     stroke="var(--color-danger)"        strokeWidth={2} dot={false} name="Nhiệt độ (°C)" />
                 <Line type="monotone" dataKey="humidity" stroke="var(--color-teal)"           strokeWidth={2} dot={false} name="Độ ẩm (%)" />
-                <Line type="monotone" dataKey="battery"  stroke="var(--color-success-light)"  strokeWidth={2} dot={false} name="Pin (%)" />
               </LineChart>
             </ResponsiveContainer>
           </div>

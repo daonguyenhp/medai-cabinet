@@ -149,7 +149,7 @@ class MQTTSubscriber:
             # Import here to avoid circular imports at module load
             if kind == "telemetry":
                 from routers.iot import _reconcile_inventory
-                from services.dynamodb import DynamoDBService
+                from services.dynamodb import DynamoDBService, _floats_to_decimals
                 from config import settings as s
                 from datetime import datetime
 
@@ -163,7 +163,8 @@ class MQTTSubscriber:
 
                 db = DynamoDBService()
                 table = db._table(s.DYNAMODB_TELEMETRY_TABLE)
-                table.put_item(Item=payload)
+                # DynamoDB rejects Python floats — convert temperature/humidity etc.
+                table.put_item(Item=_floats_to_decimals(payload))
 
                 inventory = payload.get("inventory") or {}
                 if inventory:

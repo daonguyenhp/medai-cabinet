@@ -5,45 +5,48 @@
 
 /* ─── CSS Custom Properties ─────────────────────────────────── */
 :root {
-  /* Primary palette */
-  --color-primary:        #1B3A6B;   /* Deep navy blue */
-  --color-primary-light:  #2A5298;
-  --color-primary-dark:   #122850;
-  --color-primary-50:     #EEF2F9;
-  --color-primary-100:    #D4E0F0;
+  /* Long Châu pharmacy palette
+     Primary: vivid royal blue (logo + CTAs)
+     Accent : cherry red (sale tags, highlights)
+     Surface: white with sky-blue washes */
+  --color-primary:        #1250DC;   /* Long Châu signature blue */
+  --color-primary-light:  #3B73F0;
+  --color-primary-dark:   #0B3AA8;
+  --color-primary-50:     #EAF1FF;
+  --color-primary-100:    #C7D8FA;
 
-  /* Accent */
-  --color-teal:           #2E8B8B;
-  --color-teal-light:     #3AABAB;
-  --color-teal-50:        #E8F5F5;
+  /* Accent (sale red) */
+  --color-teal:           #E11D2E;   /* Long Châu cherry red */
+  --color-teal-light:     #F23949;
+  --color-teal-50:        #FFE9EB;
 
   /* Status colors */
-  --color-success:        #2E7D32;
-  --color-success-light:  #4CAF50;
-  --color-success-bg:     #E8F5E9;
+  --color-success:        #1F8E3D;
+  --color-success-light:  #2BB257;
+  --color-success-bg:     #E6F6EB;
 
-  --color-warning:        #F5A623;
-  --color-warning-dark:   #E65100;
-  --color-warning-bg:     #FFF8E1;
+  --color-warning:        #F59E0B;
+  --color-warning-dark:   #B45309;
+  --color-warning-bg:     #FEF4D6;
 
-  --color-danger:         #D32F2F;
-  --color-danger-light:   #EF5350;
-  --color-danger-bg:      #FFEBEE;
+  --color-danger:         #D72638;
+  --color-danger-light:   #EF4D5C;
+  --color-danger-bg:      #FFE5E8;
 
-  --color-info:           #0277BD;
-  --color-info-bg:        #E1F5FE;
+  --color-info:           #0C7AD9;
+  --color-info-bg:        #E1F0FB;
 
   /* Neutrals */
   --color-white:          #FFFFFF;
-  --color-bg:             #F4F6FA;
+  --color-bg:             #F2F6FC;   /* faint sky tint */
   --color-surface:        #FFFFFF;
-  --color-border:         #DDE3EE;
-  --color-border-light:   #EEF1F8;
+  --color-border:         #D6DEEC;
+  --color-border-light:   #EAEFF8;
 
-  --color-text-primary:   #1A2332;
-  --color-text-secondary: #4A5568;
-  --color-text-muted:     #718096;
-  --color-text-disabled:  #A0AEC0;
+  --color-text-primary:   #142039;
+  --color-text-secondary: #43526E;
+  --color-text-muted:     #7283A0;
+  --color-text-disabled:  #A4AFC4;
 
   /* Typography - elderly-friendly large sizes */
   --font-family:          'Inter', 'Nunito', -apple-system, BlinkMacSystemFont, sans-serif;
@@ -67,18 +70,18 @@
   --space-10: 40px;
   --space-12: 48px;
 
-  /* Border radius */
-  --radius-sm:  6px;
-  --radius-md:  10px;
-  --radius-lg:  14px;
-  --radius-xl:  20px;
+  /* Border radius — Long Châu uses generous, friendly curves */
+  --radius-sm:  8px;
+  --radius-md:  12px;
+  --radius-lg:  16px;
+  --radius-xl:  24px;
   --radius-full: 9999px;
 
   /* Shadows */
-  --shadow-sm:  0 1px 3px rgba(27, 58, 107, 0.08), 0 1px 2px rgba(27, 58, 107, 0.04);
-  --shadow-md:  0 4px 12px rgba(27, 58, 107, 0.10), 0 2px 4px rgba(27, 58, 107, 0.06);
-  --shadow-lg:  0 8px 24px rgba(27, 58, 107, 0.12), 0 4px 8px rgba(27, 58, 107, 0.08);
-  --shadow-xl:  0 16px 40px rgba(27, 58, 107, 0.15);
+  --shadow-sm:  0 1px 3px rgba(18, 80, 220, 0.06), 0 1px 2px rgba(18, 80, 220, 0.04);
+  --shadow-md:  0 6px 16px rgba(18, 80, 220, 0.08), 0 2px 4px rgba(18, 80, 220, 0.05);
+  --shadow-lg:  0 10px 28px rgba(18, 80, 220, 0.12), 0 4px 8px rgba(18, 80, 220, 0.06);
+  --shadow-xl:  0 18px 44px rgba(18, 80, 220, 0.18);
 
   /* Transitions */
   --transition-fast:   150ms ease;
@@ -230,7 +233,7 @@ a:hover { color: var(--color-primary-light); text-decoration: underline; }
 .btn-primary:hover:not(:disabled) {
   background: var(--color-primary-light);
   border-color: var(--color-primary-light);
-  box-shadow: 0 4px 12px rgba(27, 58, 107, 0.3);
+  box-shadow: 0 6px 16px rgba(18, 80, 220, 0.30);
   transform: translateY(-1px);
 }
 
@@ -242,7 +245,7 @@ a:hover { color: var(--color-primary-light); text-decoration: underline; }
 .btn-teal:hover:not(:disabled) {
   background: var(--color-teal-light);
   border-color: var(--color-teal-light);
-  box-shadow: 0 4px 12px rgba(46, 139, 139, 0.3);
+  box-shadow: 0 6px 16px rgba(225, 29, 46, 0.28);
   transform: translateY(-1px);
 }
 
@@ -326,7 +329,7 @@ a:hover { color: var(--color-primary-light); text-decoration: underline; }
 
 .form-control:focus {
   border-color: var(--color-primary);
-  box-shadow: 0 0 0 3px rgba(27, 58, 107, 0.12);
+  box-shadow: 0 0 0 3px rgba(18, 80, 220, 0.15);
 }
 
 .form-control::placeholder { color: var(--color-text-disabled); }

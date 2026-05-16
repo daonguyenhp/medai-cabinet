@@ -9,11 +9,17 @@
 #include "stepper.h"
 #include "ir_sensor.h"
 #include "inventory.h"
+#include "dht_sensor.h"
 
 WiFiClientSecure secureClient;
 
 unsigned long lastReconnectAttempt = 0;
 unsigned long lastTelemetry        = 0;
+
+// Cached DHT22 readings — kept across cycles so a transient sensor
+// glitch doesn't blank the dashboard. NAN until first successful read.
+float lastTemperature = NAN;
+float lastHumidity    = NAN;
 
 // ----------------------------------------
 
@@ -24,13 +30,14 @@ void setup() {
 
     Serial.println();
     Serial.println("========================================");
-    Serial.println("   MedAI Cabinet — Firmware v1.0");
+    Serial.println("   MedAI Cabinet — Firmware v1.1");
     Serial.println("========================================");
 
     // Hardware
     initSteppers();
     initIRSensor();
     initInventory();
+    initDHT();
 
     // Network
     connectWiFi();
@@ -73,10 +80,17 @@ void loop() {
         mqttLoop();
     }
 
-    // Periodic telemetry (inventory ping)
+    // Periodic telemetry (inventory + DHT22 environment)
     if (millis() - lastTelemetry > TELEMETRY_INTERVAL_MS) {
         lastTelemetry = millis();
-        publishInventory();
+
+        float t, h;
+        if (readDHT(t, h)) {
+            lastTemperature = t;
+            lastHumidity    = h;
+        }
+        // Send last known good values; readDHT() keeps NAN if never succeeded
+        publishTelemetry(lastTemperature, lastHumidity);
     }
 
     delay(10);

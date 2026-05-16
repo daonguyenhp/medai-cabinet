@@ -53,8 +53,9 @@ async def ingest_telemetry(request: Request):
         payload["ttl"] = int(datetime.utcnow().timestamp()) + 7 * 86400
 
         # Store raw telemetry
+        from services.dynamodb import _floats_to_decimals
         table = db._table(settings.DYNAMODB_TELEMETRY_TABLE)
-        table.put_item(Item=payload)
+        table.put_item(Item=_floats_to_decimals(payload))
 
         # Reconcile inventory with backend medication records
         inventory = payload.get("inventory") or {}
