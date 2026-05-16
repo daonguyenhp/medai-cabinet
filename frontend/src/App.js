@@ -26,7 +26,7 @@ const DEMO_USER = {
   phone: '0901234567',
   caregiver_name: 'Nguyễn Thị Bình',
   caregiver_phone: '0907654321',
-  device_id: 'medai-esp32-001',
+  device_id: 'medai-001',
   role: 'patient',
   language: 'vi',
 };

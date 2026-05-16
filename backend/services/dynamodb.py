@@ -4,6 +4,7 @@ DynamoDB service — wraps all database operations for MedAI Cabinet.
 import boto3
 import uuid
 import logging
+from decimal import Decimal
 from datetime import datetime, date, timedelta
 from typing import List, Optional, Dict, Any
 from boto3.dynamodb.conditions import Key, Attr
@@ -11,6 +12,17 @@ from boto3.dynamodb.conditions import Key, Attr
 from config import settings
 
 logger = logging.getLogger(__name__)
+
+
+def _convert_decimals(obj):
+    """Recursively convert DynamoDB Decimal values to int/float."""
+    if isinstance(obj, list):
+        return [_convert_decimals(i) for i in obj]
+    elif isinstance(obj, dict):
+        return {k: _convert_decimals(v) for k, v in obj.items()}
+    elif isinstance(obj, Decimal):
+        return int(obj) if obj == int(obj) else float(obj)
+    return obj
 
 
 def _now_iso() -> str:
@@ -114,7 +126,7 @@ class DynamoDBService:
                     item.get("opened_date"),
                 )
                 item.update(expiry_info)
-            return items
+            return [_convert_decimals(i) for i in items]
         except Exception as e:
             logger.error(f"list_medications error: {e}")
             return []
@@ -132,6 +144,7 @@ class DynamoDBService:
                     item.get("opened_date"),
                 )
                 item.update(expiry_info)
+                return _convert_decimals(item)
             return item
         except Exception as e:
             logger.error(f"get_medication error: {e}")
